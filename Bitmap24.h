@@ -5,6 +5,7 @@
 #include <string>
 #include <cstdint>
 #include <iomanip>
+#include <cstdlib>
 
 using namespace std;
 
@@ -46,9 +47,7 @@ class Bitmap24 {
 
 public:
     // Arrays for storing (R,G,B) values
-    uint8_t* R;
-    uint8_t* G;
-    uint8_t* B;
+    uint8_t* pixels;
 
     // Dimensions
     uint32_t height;
