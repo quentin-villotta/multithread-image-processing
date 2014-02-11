@@ -1,12 +1,18 @@
 #pragma once
 
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <cstdint>
+#include <iomanip>
 
 using namespace std;
 
 // See http://www.dragonwins.com/domains/getteched/bmp/bmpfileformat.htm
+
+// struct padding
+#pragma pack(push)
+#pragma pack(2)
 
 struct Bitmap24FileHeader {
     uint16_t bf_type;
@@ -15,6 +21,8 @@ struct Bitmap24FileHeader {
     uint16_t bf_reserved2;
     uint32_t bf_offbits;
 };
+
+typedef struct Bitmap24FileHeader Bitmap24FileHeader;
 
 struct Bitmap24InfoHeader {
     uint32_t bi_size;
@@ -30,11 +38,17 @@ struct Bitmap24InfoHeader {
     uint32_t bi_clr_important;
 };
 
+typedef struct Bitmap24InfoHeader Bitmap24InfoHeader;
+
+#pragma pack(pop)
+
 class Bitmap24 {
 
 public:
     // Arrays for storing (R,G,B) values
-    uint8_t* R, G, B;
+    uint8_t* R;
+    uint8_t* G;
+    uint8_t* B;
 
     // Dimensions
     uint32_t height;
@@ -43,14 +57,20 @@ public:
     //unsigned int max_col_val;
 
     // Bitmap headers
-    struct Bitmap24FileHeader file_header;
-    struct Bitmap24InfoHeader info_header;
+    Bitmap24FileHeader* file_header;
+    Bitmap24InfoHeader* info_header;
 
     Bitmap24(const string& fname);
+    Bitmap24(const uint32_t _height, const uint32_t _width); 
+    ~Bitmap24();
+
+    void print_headers();
+
+    // Read the BMP image from fname
+    //void read(const std::string &fname);
+    // Write the BMP image in fname
+    //void write(const std::string &fname);
 };
-
-
-
 
 // class ppm {
 //     bool flag_alloc;
