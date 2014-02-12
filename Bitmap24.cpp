@@ -10,15 +10,20 @@ Bitmap24::Bitmap24(const string& fname)
 }
 
 // Create an empty BMP to be filled
-Bitmap24::Bitmap24(const uint32_t _height, const uint32_t _width)
+Bitmap24::Bitmap24(const uint32_t _height, const uint32_t _width, 
+	uint8_t r, uint8_t g, uint8_t b)
 {
 	height = _height;
 	width = _width;
 	size = height * width;
 
 	pixels = new uint8_t[3 * size];
-	for(uint32_t i = 0; i < 3 * size; i++)
-		pixels[i] = 0;
+	for(uint32_t i = 0; i < size; i++) {
+		// (pixels[3*i], pixels[3*i+1], pixels[3*i+2]) = (B,G,R) of i-th pixel
+		pixels[3*i] = b;
+		pixels[3*i+1] = g;
+		pixels[3*i+2] = r;
+	}
 
 	file_header = new Bitmap24FileHeader;
 	file_header->bf_type = 0x4D42;

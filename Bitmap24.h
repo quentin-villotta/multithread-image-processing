@@ -59,7 +59,7 @@ public:
     Bitmap24InfoHeader* info_header;
 
     Bitmap24(const string& fname);
-    Bitmap24(const uint32_t _height, const uint32_t _width); 
+    Bitmap24(const uint32_t _height, const uint32_t _width, uint8_t r = 0, uint8_t g = 0, uint8_t b = 0); 
     ~Bitmap24();
 
     void print_headers();
