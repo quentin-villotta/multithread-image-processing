@@ -1,7 +1,7 @@
 #include "Bitmap24.H"
 
 // Load BMP from file
-Bitmap24::Bitmap24(const string& fname)
+Bitmap24::Bitmap24(const std::string& fname)
 {
 	read(fname);
 	height = info_header->bi_height;
@@ -55,27 +55,27 @@ Bitmap24::~Bitmap24()
 
 void Bitmap24::print_headers()
 {
-	cout << "bf_size = " << file_header->bf_size << "\n";
-	cout << "bf_offbits = " << file_header->bf_offbits << "\n";
-	cout << "bi_size = " << info_header->bi_size << "\n";
-	cout << "bi_width = " << info_header->bi_width << "\n";
-	cout << "bi_height = " << info_header->bi_height << "\n";
-	cout << "bi_size_image = " << info_header->bi_size_image << "\n";
-	cout << "bi_clr_used = " << info_header->bi_clr_used << "\n";
-	cout << "bi_clr_important = " << info_header->bi_clr_important << "\n";
+	std::cout << "bf_size = " << file_header->bf_size << "\n";
+	std::cout << "bf_offbits = " << file_header->bf_offbits << "\n";
+	std::cout << "bi_size = " << info_header->bi_size << "\n";
+	std::cout << "bi_width = " << info_header->bi_width << "\n";
+	std::cout << "bi_height = " << info_header->bi_height << "\n";
+	std::cout << "bi_size_image = " << info_header->bi_size_image << "\n";
+	std::cout << "bi_clr_used = " << info_header->bi_clr_used << "\n";
+	std::cout << "bi_clr_important = " << info_header->bi_clr_important << "\n";
 }
 
-void Bitmap24::write(const string& fname)
+void Bitmap24::write(const std::string& fname)
 {
-	ofstream file(fname, ios::binary);
+	std::ofstream file(fname, std::ios::binary);
 	file.write((char*)file_header, sizeof(Bitmap24FileHeader));
 	file.write((char*)info_header, sizeof(Bitmap24InfoHeader));
 	file.write((char*)pixels, 3 * size);
 }
 
-void Bitmap24::read(const string& fname)
+void Bitmap24::read(const std::string& fname)
 {
-	ifstream file(fname, ios::binary);
+	std::ifstream file(fname, std::ios::binary);
 
 	if(file) {
 		// Header buffers
@@ -101,7 +101,7 @@ void Bitmap24::read(const string& fname)
 		file.read((char*)pixels, info_header->bi_size_image);
 	}
 	else {
-		cout << "Error while loading " << fname << " file\n";
+		std::cout << "Error while loading " << fname << " file\n";
 		exit(EXIT_FAILURE);
 	}
 }
