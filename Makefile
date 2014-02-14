@@ -6,15 +6,16 @@ CC=clang++
 # Objects
 OBJECTS=*.o
 
-# Compiler flags
-CPPFLAGS=""
-
 # Linker flags
-#LDFLAGS=-L/opt/local/lib -lSDL -lSDLmain -lboost_program_options-mt -lboost_timer-mt -framework Cocoa
+LDFLAGS=''
 
-main: main.cpp
-	$(CC) $(CPPFLAGS) -c *.cpp
-	$(CC) *.o $(CPPFLAGS) $(LDFLAGS)
+debug: main.cpp
+	$(CC) -c *.cpp -g -std=c++11
+	$(CC) *.o $(LDFLAGS) -g -std=c++11
+
+release: main.cpp
+	$(CC) -c *.cpp -O3 -std=c++11
+	$(CC) *.o $(LDFLAGS) -O3 -std=c++11
 
 clean:
 	rm *.o a.out
