@@ -43,9 +43,9 @@ void apply(const Bitmap24& in, Bitmap24& out, const LinearFilter& filter, uint32
 	}
 	//printf("r_sum = %d\n", (uint8_t) min(max(r_sum, 0.0), 255.0));
 
-	out.pixels[3*(pixel-1)+2] = (uint8_t) min(max(r_sum, 0.0), 255.0); 
-	out.pixels[3*(pixel-1)+1] = (uint8_t) min(max(g_sum, 0.0), 255.0); 
-	out.pixels[3*(pixel-1)] = (uint8_t) min(max(b_sum, 0.0), 255.0);
+	out.pixels[3*(pixel-1)+2] = (uint8_t) min(max(filter.factor * r_sum + filter.bias, 0.0), 255.0); 
+	out.pixels[3*(pixel-1)+1] = (uint8_t) min(max(filter.factor * g_sum + filter.bias, 0.0), 255.0); 
+	out.pixels[3*(pixel-1)] = (uint8_t) min(max(filter.factor * b_sum + filter.bias, 0.0), 255.0);
 }
 
 void apply_range(const Bitmap24& in, Bitmap24& out, const LinearFilter& filter, uint32_t pixel_start, uint32_t pixel_end)
@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
 	//      0,  0,  0,  0,  0,
 	//      0,  0,  0,  0,  0,
 	// };
-	LinearFilter filter(3, 3, t);
+	LinearFilter filter(3, 3, t, 1.0, 0.0	);
 
 	apply_range(in, out, filter, 1, in.size + 1);
 	
