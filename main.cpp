@@ -2,12 +2,28 @@
 #include <iostream>
 #include <cstdint>
 #include <cstdio>
+#include <cstdlib>
+#include <sys/time.h>
 #include <algorithm>
+#include <vector>
+#include <thread>
 
 #include "Bitmap24.h"
 #include "LinearFilter.h"
 
 using namespace std;
+
+double time_diff(struct timeval x , struct timeval y)
+{
+    double x_ms , y_ms , diff;
+     
+    x_ms = (double)x.tv_sec*1000000 + (double)x.tv_usec;
+    y_ms = (double)y.tv_sec*1000000 + (double)y.tv_usec;
+     
+    diff = (double)y_ms - (double)x_ms;
+     
+    return diff;
+}
 
 void apply(const Bitmap24& in, Bitmap24& out, const LinearFilter& filter, uint32_t pixel)
 {
@@ -58,7 +74,7 @@ void apply_range(const Bitmap24& in, Bitmap24& out, const LinearFilter& filter, 
 int main(int argc, char *argv[])
 {
 	if(argc < 3) {
-		cout << "Usage: ./a.out input.bmp output.bmp\n";
+		cout << "Usage: ./a.out input.bmp output.bmp num_thread\n";
 		return 1;
 	}
 
@@ -71,41 +87,34 @@ int main(int argc, char *argv[])
 	    -1,  8, -1,
 	    -1, -1, -1
 	};
-	// double t[] =
-	// {
-	//     0.0, 0.0, 0.0,
-	//     0.0, 1.0, 0.0,
-	//     0.0, 0.0, 0.0
-	// };
-	// double t[] =
-	// {
-	//      1,  1,  1,
-	//      1, -7,  1,
-	//      1,  1,  1
-	// };
-	// double t[] =
-	// {
-	//     1.0/9.0, 0, 0, 0, 0, 0, 0, 0, 0,
-	//     0, 1.0/9.0, 0, 0, 0, 0, 0, 0, 0,
-	//     0, 0, 1.0/9.0, 0, 0, 0, 0, 0, 0,
-	//     0, 0, 0, 1.0/9.0, 0, 0, 0, 0, 0,
-	//     0, 0, 0, 0, 1.0/9.0, 0, 0, 0, 0,
-	//     0, 0, 0, 0, 0, 1.0/9.0, 0, 0, 0,
-	//     0, 0, 0, 0, 0, 0, 1.0/9.0, 0, 0,
-	//     0, 0, 0, 0, 0, 0, 0, 1.0/9.0, 0,
-	//     0, 0, 0, 0, 0, 0, 0, 0, 1.0/9.0,
-	// };
-	// double t[] =
-	// {
-	//      0,  0,  0,  0,  0,
-	//      0,  0,  0,  0,  0,
-	//     -1, -1,  2,  0,  0,
-	//      0,  0,  0,  0,  0,
-	//      0,  0,  0,  0,  0,
-	// };
-	LinearFilter filter(3, 3, t, 1.0, 0.0	);
+	LinearFilter filter(3, 3, t, 1.0, 0.0);
 
-	apply_range(in, out, filter, 1, in.size + 1);
+	int num_thread = atoi(argv[3]);
+	vector<thread> thread_pool;
+
+	int job_size = in.size / num_thread;
+
+	struct timeval start, end;
+	gettimeofday(&start , NULL);
+
+	for(int i = 0; i < num_thread - 1; i++) {
+		int start = i * job_size + 1;
+		thread_pool.push_back(thread(apply_range, ref(in), ref(out), ref(filter), start, start + job_size));
+	}
+
+	// use the main thread to do park of the work
+	apply_range(in, out, filter, job_size * (num_thread - 1) + 1, in.size);
+
+	// Join
+	for(int i = 0; i < num_thread - 1; i++)
+		thread_pool[i].join();
+
+	gettimeofday(&end , NULL);
+
+	cout << "Time: " << time_diff(start, end) / 1000.0 << "ms\n";
+
+	// Monothread equivalent
+	// apply_range(in, out, filter, 1, in.size + 1);
 	
 	out.write(argv[2]);
 
